@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
 import butterknife.Bind;
+import butterknife.ButterKnife;
 import com.jakewharton.rxbinding.view.RxView;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    ButterKnife.bind(this);
 
     final Observable<String> obsButtonA = RxView.clicks(buttonA).map(new Func1<Void, String>() {
       @Override public String call(Void aVoid) {
