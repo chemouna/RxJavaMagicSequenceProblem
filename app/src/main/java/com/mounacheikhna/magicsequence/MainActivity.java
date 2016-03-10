@@ -20,27 +20,34 @@ public class MainActivity extends AppCompatActivity {
   @Bind(R.id.buttonA) Button buttonA;
   @Bind(R.id.buttonB) Button buttonB;
   @Bind(R.id.result) TextView resultView;
+  private Observable<String> obsButtonA;
+  private Observable<String> obsButtonB;
+  private Observable<String> obsButtons;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
     ButterKnife.bind(this);
 
-    final Observable<String> obsButtonA = RxView.clicks(buttonA).map(new Func1<Void, String>() {
+    obsButtonA = RxView.clicks(buttonA).map(new Func1<Void, String>() {
       @Override public String call(Void aVoid) {
         return "A";
       }
     });
-    final Observable<String> obsButtonB = RxView.clicks(buttonB).map(new Func1<Void, String>() {
+    obsButtonB = RxView.clicks(buttonB).map(new Func1<Void, String>() {
       @Override public String call(Void aVoid) {
         return "B";
       }
     });
 
-    final Observable<String> obsButtons = Observable.merge(obsButtonA, obsButtonB);
-    obsButtons.buffer(6, 1)
+    obsButtons = Observable.merge(obsButtonA, obsButtonB);
+    attempt2();
+  }
+
+  private void attempt2() {
+    obsButtons.buffer(MAGIC_SEQUENCE.length(), 1) // why skip 1 ?
         .timeout(5000, TimeUnit.SECONDS, Observable.just(new ArrayList<String>()))
-        .repeat()
+        .repeat() //why repeat
         .doOnNext(new Action1<List<String>>() {
           @Override public void call(List<String> strings) {
             resultView.setText(concatStringsWSep(strings, ""));
@@ -66,6 +73,25 @@ public class MainActivity extends AppCompatActivity {
       sep = separator;
     }
     return sb.toString();
+  }
+
+  private void attempt1() {
+    obsButtons.buffer(5000, TimeUnit.SECONDS, MAGIC_SEQUENCE.length())
+        .map(new Func1<List<String>, String>() {
+          @Override public String call(List<String> strings) {
+            return concatStringsWSep(strings, "");
+          }
+        })
+        .filter(new Func1<String, Boolean>() {
+          @Override public Boolean call(String s) {
+            return MAGIC_SEQUENCE.equals(s);
+          }
+        })
+        .subscribe(new Action1<String>() {
+          @Override public void call(String s) {
+            resultView.setText("BRAVO! Magic Sequence entered.");
+          }
+        });
   }
 
 }
