@@ -12,6 +12,3 @@ until the end of the 5 second interval before the message is printed.
 As soon as the secret combination is fulfilled (within 5 seconds) the message should be displayed 
 regardless of what has been clicked before. For example a combination like “BBABBABA” is ok as long 
 as “ABBABA” is clicked within 5 seconds.
-
-
-### Modification to the problem : 
